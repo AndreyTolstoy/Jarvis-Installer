@@ -10,7 +10,6 @@ REP = "https://github.com/AndreyTolstoy/Jarvis/archive/refs/heads/main.zip"
 PIP = "https://bootstrap.pypa.io/get-pip.py"
 
 J = Path.home() / 'Downloads' / 'Jarvis'
-STARTUP =  ([path.resolve() for path in Path.home().rglob("Startup")][0])
 disk = Path.home()
 
 start = time.time()
@@ -19,7 +18,8 @@ colorama.just_fix_windows_console()
 
 data = {
    "pth" : "python311.zip\npython311\\site-packages\n.\nimport site\n",
-   "bat" : f"@echo off\ncd /d {J}\\Jarvis-main\\Jarvis-main\\\n..\..\python\python.exe run.py"
+   "bat" : f"@echo off\ncd /d '%-dp0'\n..\..\python\python.exe run.py",
+   "task_manager" : f'schtasks /create /tn "JarvisStarter" /tr "{J}\\Jarvis-main\\Jarvis-main\\start.bat" /sc onlogon' 
    }
 
 
@@ -68,12 +68,21 @@ def get_pip():
 
 def download_lib():
     os.system(f"{J}\\python\\python.exe -m pip install -r {J}\\Jarvis-main\\Jarvis-main\\requirements.txt")
+    starter_bat()
+
+
+def starter_bat():
+    with open(f"{J}\\Jarvis-main\\Jarvis-main\\start.bat", "w") as f:
+        f.write(data["bat"])
+    
+    output("Runner .bat: Done")
+
 
 def auto_starter_status():
     while True:
-     keyboard = input("Do u want add 'Jarvis' to startup? (Y/N) ").upper()
+     keyboard = input("Do u want add 'Jarvis' to task manage (Start with system)? (Y/N) ").upper()
      if keyboard == "Y":
-      auto_starter()
+      task_manager()
       return
      
      elif keyboard == "N":
@@ -82,13 +91,10 @@ def auto_starter_status():
      else:
         pass
 
+def task_manager():
+   os.system(data["task_manager"])
+   output("Task manager: Done")
 
-def auto_starter():
-    with open(f"{STARTUP}\\JarvisStarter.bat", "w") as f:
-        f.write(data["bat"])
-    
-    output(".bat (Auto starter): Done")
-    output("===Jarvis will start after the system reboot===")
 
     
 
@@ -113,4 +119,4 @@ if not Path(J).exists():
 else:
    output("Jarvis already install or u already have a folder named 'Jarvis' (please rename it)")
 
-input("Нажмите enter чтобы выйти...")
+input("Press Enter to exit...")
