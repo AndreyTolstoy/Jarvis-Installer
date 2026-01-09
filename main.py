@@ -80,7 +80,7 @@ def starter_bat():
 
 def auto_starter_status():
     while True:
-     keyboard = input("Do u want add 'Jarvis' to task manage (Start with system)? (Y/N) ").upper()
+     keyboard = input("Do u want add 'Jarvis' to task manage (Start with system)? (Y/N) ").upper().strip()
      if keyboard == "Y":
       task_manager()
       return
