@@ -62,7 +62,7 @@ def get_pip():
     with open(f"{J}\\get-pip.py", "wb") as f: 
         f.write(get.content) 
     
-    os.system(f"{J}\\python\\python.exe {J}\get-pip.py")
+    os.system(f"{J}\\python\\python.exe {J}\\get-pip.py")
     os.remove(f"{J}\\get-pip.py")
 
 
