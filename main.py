@@ -10,15 +10,13 @@ REP = "https://github.com/AndreyTolstoy/Jarvis/archive/refs/heads/main.zip"
 PIP = "https://bootstrap.pypa.io/get-pip.py"
 
 J = Path.home() / 'Downloads' / 'Jarvis'
-disk = Path.home()
-
 start = time.time()
 colorama.init()
 colorama.just_fix_windows_console()
 
 data = {
    "pth" : "python311.zip\npython311\\site-packages\n.\nimport site\n",
-   "bat" : f"@echo off\ncd /d '%-dp0'\n..\..\python\python.exe run.py",
+   "bat" : f"@echo off\ncd /d '%~dp0'\n..\..\python\python.exe run.py",
    "task_manager" : f'schtasks /create /tn "JarvisStarter" /tr "{J}\\Jarvis-main\\Jarvis-main\\start.bat" /sc onlogon' 
    }
 
