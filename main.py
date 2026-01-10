@@ -76,7 +76,7 @@ def get_pip():
 
 
 def download_lib():
-    subprocess.run([f"{J}\\python\\python.exe", "-m pip install", f"{J}\\Jarvis-main\\Jarvis-main\\requirements.txt"], shell=False)
+    subprocess.run([f"{J}\\python\\python.exe", "-m", "pip", "install", "-r",  f"{J}\\Jarvis-main\\Jarvis-main\\requirements.txt"], shell=False)
     starter_bat()
 
 
