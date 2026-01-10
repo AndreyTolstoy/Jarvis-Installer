@@ -1,4 +1,5 @@
 import requests
+import subprocess
 import os
 import zipfile
 from pathlib import Path
@@ -9,28 +10,38 @@ URL = "https://www.python.org/ftp/python/3.11.0/python-3.11.0-embed-amd64.zip"
 REP = "https://github.com/AndreyTolstoy/Jarvis/archive/refs/heads/main.zip"
 PIP = "https://bootstrap.pypa.io/get-pip.py"
 
-J = Path.home() / 'Downloads' / 'Jarvis'
 start = time.time()
 colorama.init()
 colorama.just_fix_windows_console()
 
+J = None
 data = {
    "pth" : "python311.zip\npython311\\site-packages\n.\nimport site\n",
    "bat" : f"@echo off\ncd /d '%~dp0'\n..\..\python\python.exe run.py",
-   "task_manager" : f'schtasks /create /tn "JarvisStarter" /tr "{J}\\Jarvis-main\\Jarvis-main\\start.bat" /sc onlogon' 
+   "task_manager" : f'schtasks /create /tn "JarvisStarter" /tr "{J}\\Jarvis-main\\Jarvis-main\\start.bat" /sc onlogon' ,
+   "dialog" : ["powershell", "-NoProfile", "-Command", "Add-Type -AssemblyName System.Windows.Forms;" "$f=New-Object System.Windows.Forms.FolderBrowserDialog;" "if($f.ShowDialog() -eq 'OK'){Write-Output $f.SelectedPath}"]
    }
 
 
-def output(text):
-   print(colorama.Style.BRIGHT + colorama.Fore.GREEN + text + colorama.Style.RESET_ALL)
+def output(text, color="GREEN"):
+   print(colorama.Style.BRIGHT + getattr(colorama.Fore, color) + text + colorama.Style.RESET_ALL)
+
+def input_path():
+   global J
+   path = subprocess.run(data["dialog"], capture_output=True, text=True)
+   J = Path(path.stdout.strip()) / "Jarvis"
+
+   
 
 
 def install_py(): 
+    output("Requesting python.org...", color="BLUE")
     get = requests.get(URL) 
     get.raise_for_status()
     write_installed_file(f"{J}\\python.zip", get.content)
 
 def install_Jarvis():
+    output("Requesting github.com...", color="BLUE")
     get = requests.get(REP) 
     get.raise_for_status()
     write_installed_file(f"{J}\\Jarvis-main.zip", get.content)
@@ -60,12 +71,12 @@ def get_pip():
     with open(f"{J}\\get-pip.py", "wb") as f: 
         f.write(get.content) 
     
-    os.system(f"{J}\\python\\python.exe {J}\\get-pip.py")
+    subprocess.run([f"{J}\\python\\python.exe", f"{J}\\get-pip.py"], shell=False)
     os.remove(f"{J}\\get-pip.py")
 
 
 def download_lib():
-    os.system(f"{J}\\python\\python.exe -m pip install -r {J}\\Jarvis-main\\Jarvis-main\\requirements.txt")
+    subprocess.run([f"{J}\\python\\python.exe", "-m pip install", f"{J}\\Jarvis-main\\Jarvis-main\\requirements.txt"], shell=False)
     starter_bat()
 
 
@@ -78,7 +89,7 @@ def starter_bat():
 
 def auto_starter_status():
     while True:
-     keyboard = input("Do u want add 'Jarvis' to task manage (Start with system)? (Y/N) ").upper().strip()
+     keyboard = input("Do u want add 'Jarvis' to task manager (Start with system)? (Y/N) ").upper().strip()
      if keyboard == "Y":
       task_manager()
       return
@@ -97,6 +108,7 @@ def task_manager():
     
 
 print(colorama.Style.BRIGHT + "===Jarvis Installer v0.0.2===" + colorama.Style.RESET_ALL)
+input_path()
 if not Path(J).exists():
  os.makedirs(J)
  install_py()
@@ -115,6 +127,6 @@ if not Path(J).exists():
  output("Download completed in " + str(round(time.time() - start)) + "seconds")
 
 else:
-   output("Jarvis already install or u already have a folder named 'Jarvis' (please rename it)")
+   output("Jarvis already install or u already have a folder named 'Jarvis' in this folder (please rename it)")
 
 input("Press Enter to exit...")
