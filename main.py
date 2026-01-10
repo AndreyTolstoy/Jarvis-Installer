@@ -14,24 +14,19 @@ start = time.time()
 colorama.init()
 colorama.just_fix_windows_console()
 
-J = None
+J = Path(subprocess.run(
+   ["powershell", "-NoProfile", "-Command", "Add-Type -AssemblyName System.Windows.Forms;" "$f=New-Object System.Windows.Forms.FolderBrowserDialog;" "if($f.ShowDialog() -eq 'OK'){Write-Output $f.SelectedPath}"], 
+   capture_output=True, text=True).stdout.strip()) / "Jarvis"
+
 data = {
    "pth" : "python311.zip\npython311\\site-packages\n.\nimport site\n",
    "bat" : f"@echo off\ncd /d '%~dp0'\n..\..\python\python.exe run.py",
    "task_manager" : f'schtasks /create /tn "JarvisStarter" /tr "{J}\\Jarvis-main\\Jarvis-main\\start.bat" /sc onlogon' ,
-   "dialog" : ["powershell", "-NoProfile", "-Command", "Add-Type -AssemblyName System.Windows.Forms;" "$f=New-Object System.Windows.Forms.FolderBrowserDialog;" "if($f.ShowDialog() -eq 'OK'){Write-Output $f.SelectedPath}"]
    }
 
 
 def output(text, color="GREEN"):
    print(colorama.Style.BRIGHT + getattr(colorama.Fore, color) + text + colorama.Style.RESET_ALL)
-
-def input_path():
-   global J
-   path = subprocess.run(data["dialog"], capture_output=True, text=True)
-   J = Path(path.stdout.strip()) / "Jarvis"
-
-   
 
 
 def install_py(): 
@@ -108,7 +103,6 @@ def task_manager():
     
 
 print(colorama.Style.BRIGHT + "===Jarvis Installer v0.0.2===" + colorama.Style.RESET_ALL)
-input_path()
 if not Path(J).exists():
  os.makedirs(J)
  install_py()
