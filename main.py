@@ -20,9 +20,21 @@ J = Path(subprocess.run(
 
 data = {
    "pth" : "python311.zip\npython311\\site-packages\n.\nimport site\n",
-   "bat" : f"@echo off\ncd /d '%~dp0'\n..\..\python\python.exe run.py",
-   "task_manager" : f'schtasks /create /tn "JarvisStarter" /tr "{J}\\Jarvis-main\\Jarvis-main\\start.bat" /sc onlogon' ,
-   }
+   "bat" : f"@echo off\ncd /d '%~dp0'\nmode con: col=156 lines=56\n..\..\python\python.exe run.py",
+   "task_manager" : rf"""
+$a = New-ScheduledTaskAction `
+    -Execute '{J}\python\python.exe' `
+    -Argument 'run.py' `
+    -WorkingDirectory '{J}\Jarvis-main\Jarvis-main'
+
+Register-ScheduledTask `
+    -TaskName 'JarvisStarter' `
+    -Action $a `
+    -Trigger (New-ScheduledTaskTrigger -AtLogOn) `
+    -Force
+"""
+}
+
 
 
 def output(text, color="GREEN"):
@@ -96,7 +108,11 @@ def auto_starter_status():
         pass
 
 def task_manager():
-   os.system(data["task_manager"])
+   subprocess.run(
+       ["powershell.exe", "-NoProfile", "-Command", data["task_manager"]],
+       check=True
+   )
+
    output("Task manager: Done")
 
 
