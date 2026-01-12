@@ -20,7 +20,7 @@ J = Path(subprocess.run(
 
 data = {
    "pth" : "python311.zip\npython311\\site-packages\n.\nimport site\n",
-   "bat" : f"@echo off\ncd /d '%~dp0'\nmode con: col=156 lines=56\n..\..\python\python.exe run.py",
+   "bat" : f"@echo off\ncd /d '%~dp0'\n..\..\python\python.exe run.py",
    "task_manager" : rf"""
 $a = New-ScheduledTaskAction `
     -Execute '{J}\python\python.exe' `
